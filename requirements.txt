@@ -1,0 +1,2 @@
+# No se necesitan paquetes externos para ejecutar el generador, el detector, el gestor y las pruebas.
+# Python 3.10+ estándar.
