@@ -1,183 +1,191 @@
-# Centro de operaciones — tienda online
+# Centro de operaciones para tienda online
 
-**Proyecto de portafolio · Python + CSV + Google Sheets / LibreOffice Calc · 100 % ficticio**
+Simulación de operaciones de una tienda online desarrollada con Python, archivos CSV y una planilla de análisis. El sistema procesa 500 pedidos ficticios, sus pagos y envíos, junto con 120 tickets de soporte, para identificar anomalías y generar informes operativos.
 
-Sistema demostrativo que simula la operación de una tienda con **500 pedidos**, pagos,
-envíos y 120 tickets de soporte. Detecta riesgos y anomalías, emite un informe diario,
-ofrece un panel de indicadores y permite registrar la resolución de casos sin eliminar
-la evidencia original.
+Permite investigar incidencias, registrar las acciones realizadas y conservar el historial de resoluciones sin modificar los datos originales.
 
-## Vista rápida
+Tecnologías: Python 3.10+, CSV, Google Sheets y LibreOffice Calc. No requiere dependencias externas de Python.
 
-![Panel del centro de operaciones](evidencias/panel_vista_previa.png)
+## Demostración
 
-[▶ Ver demostración subtitulada de tres incidencias (47 segundos)](evidencias/demo_tres_incidencias.mp4)
+![Panel de indicadores del centro de operaciones](evidencias/panel_vista_previa.png)
 
-**Resultados de ejemplo (corte 2026-10-21):** 500 pedidos; 14 posibles duplicados;
-16 pagos con diferencias; 52 envíos atrasados; 43 incumplimientos SLA;
-125 incidencias detectadas (antes de documentar resoluciones).
+[Ver planilla pública (solo lectura)](https://docs.google.com/spreadsheets/d/1GUptLa6Q2qjPZYHpui-Nl0Ty-8xsvgFl/edit) · [Ver demostración de tres incidencias (47 s)](evidencias/demo_tres_incidencias.mp4)
 
-> Todos los datos fueron **generados por código**. No son clientes reales ni ventas reales.
-> La cantidad de incidencias cambia con la fecha de corte o la bitácora de resoluciones.
+Resultados de la simulación al **21 de octubre de 2026**:
 
-## Estructura del repositorio
+| Indicador | Resultado |
+|---|---:|
+| Pedidos | 500 |
+| Tickets de soporte | 120 |
+| Posibles pedidos duplicados | 14 |
+| Pagos con diferencias | 16 |
+| Envíos atrasados | 52 |
+| Incumplimientos de SLA | 43 |
+| Incidencias detectadas | 125 |
 
-```text
-centro-operaciones-tienda/
-├── data/
-│   ├── pedidos.csv            # 500 registros
-│   ├── pagos.csv              # 500 registros
-│   ├── envios.csv             # 500 registros
-│   ├── tickets.csv            # 120 registros
-│   └── resoluciones.csv       # historial de decisiones, inicialmente vacío
-├── scripts/
-│   ├── generar_datos.py       # datos sintéticos reproducibles
-│   ├── analizar.py            # 4 controles + informe diario
-│   └── gestionar.py           # documentar resolución o reapertura
-├── tests/test_controles.py
-├── reports/                   # CSV, JSON y Markdown emitidos por Python
-├── evidencias/                # vista previa del panel
-├── docs/                       # explicación de controles, casos y publicación
-├── panel_operaciones.xlsx      # planilla para Google Sheets / Calc
-└── ejecutar_informe.bat        # ejecución diaria en Windows
-```
+Los registros, clientes y operaciones son ficticios. Las cifras corresponden a una fecha de corte fija y pueden cambiar si se utiliza otra fecha o se documentan resoluciones.
 
-## 1. Ejecución en Windows (sin instalar paquetes)
+## Funcionalidades
 
-Necesitas **Python 3.10 o posterior**. Abre PowerShell dentro de la carpeta raíz:
+El análisis de Python aplica cuatro controles:
+
+| Control | Criterio |
+|---|---|
+| Posibles duplicados | Mismo cliente, producto, cantidad y monto en un intervalo de 10 minutos. |
+| Diferencias de pago | Pago aprobado cuyo monto no coincide con el total del pedido. |
+| Envíos atrasados | Envío no entregado cuya fecha comprometida ya pasó. |
+| SLA incumplido | Primera respuesta fuera del plazo o ausencia de respuesta al cierre. |
+
+Además, el proyecto incluye:
+
+- Panel de métricas y gráficos con desglose de pedidos e incidencias.
+- Análisis de pedidos por región y categoría.
+- Informe en Markdown, catálogo de incidencias en CSV e indicadores en JSON.
+- Bitácora para documentar resoluciones y reaperturas sin eliminar hallazgos.
+- Ejecución programable y pruebas unitarias.
+
+## Instalación y ejecución
+
+Se necesita Python 3.10 o posterior. No es necesario instalar paquetes con `pip`.
+
+Abre una terminal en la raíz del repositorio, donde se encuentran `README.md`, `data/` y `scripts/`.
+
+En Windows (PowerShell):
 
 ```powershell
 py -3 scripts/analizar.py --as-of 2026-10-21
 ```
 
-En Linux/macOS usa `python3` en lugar de `py -3`.
+En Linux o macOS:
 
-Se actualizan estos archivos:
+```bash
+python3 scripts/analizar.py --as-of 2026-10-21
+```
 
-- `reports/incidencias.csv` — catálogo auditable de hallazgos y su estado.
-- `reports/indicadores.json` — métricas estructuradas.
-- `reports/informe_2026-10-21.md` — informe fechado.
-- `reports/informe_ultimo.md` — versión más reciente.
+El comando actualiza:
 
-Para usar la fecha actual, ejecuta:
+| Archivo | Contenido |
+|---|---|
+| `reports/incidencias.csv` | Incidencias detectadas y estado operativo. |
+| `reports/indicadores.json` | Indicadores estructurados. |
+| `reports/informe_2026-10-21.md` | Informe de la fecha indicada. |
+| `reports/informe_ultimo.md` | Último informe generado. |
+
+Para analizar los datos con la fecha actual, omite `--as-of`:
 
 ```powershell
 py -3 scripts/analizar.py
 ```
 
-Los CSV son una **foto fija** de la simulación; sin incorporar pedidos reales nuevos,
-los resultados basados en fechas evolucionarán de manera artificial después del corte.
-Para la demostración y la comparación de cifras, usa `--as-of 2026-10-21`.
+Los registros de ejemplo no incorporan pedidos nuevos automáticamente. Para reproducir los resultados publicados, utiliza siempre la fecha de corte `2026-10-21`.
 
-Opcional: regenera el conjunto ficticio con la misma semilla:
+También puedes regenerar los datos ficticios con la misma semilla:
 
 ```powershell
 py -3 scripts/generar_datos.py
 ```
 
-Esto reemplaza pedidos, pagos, envíos y tickets por el dataset de demostración,
-pero **no borra** `data/resoluciones.csv`.
+Este comando reemplaza los CSV de pedidos, pagos, envíos y tickets, pero no borra `data/resoluciones.csv`.
 
-## 2. Examinar el panel en Google Sheets o LibreOffice Calc
+## Investigación y gestión de incidencias
 
-Abre `panel_operaciones.xlsx` en LibreOffice Calc, o en Drive sube el archivo,
-haz clic derecho **Abrir con → Hojas de cálculo de Google** y, si lo deseas,
-guárdalo como archivo de Sheets. Incluye:
+Consulta `reports/incidencias.csv` para identificar los casos. El script `gestionar.py` agrega acciones a `data/resoluciones.csv`; no corrige pagos ni contacta clientes o transportistas reales.
 
-| Hoja | Contenido |
-|---|---|
-| `Panel` | Indicadores, distribuciones y gráficos |
-| `Resumen_cruzado` | Matriz por región/categoría, con fórmulas tipo tabla dinámica |
-| `Pedidos` | 500 registros sintéticos |
-| `Pagos` | 500 pagos |
-| `Envios` | 500 envíos |
-| `Tickets` | 120 tickets y SLA |
-| `Incidencias` | Hallazgos detectados, estado y acción |
-| `Parametros` | Fecha de corte y criterios |
-| `Guia` | Orientación dentro del archivo |
-
-**Tabla dinámica nativa:** la hoja `Resumen_cruzado` es una matriz de agregación
-**con fórmulas** (no un objeto PivotTable). Si necesitas una tabla dinámica nativa
-editable en Sheets/Calc, créala siguiendo `docs/publicar.md`. Se incluye el resumen
-para que la planilla tenga análisis útil desde el primer momento.
-
-**Actualización:** la planilla entregada refleja un snapshot. Al ejecutar Python
-se actualizan los informes y el archivo `reports/incidencias.csv`, **no se sincroniza
-sola la planilla**. Para reflejar resoluciones en Sheets, vuelve a importar la hoja
-`Incidencias` desde ese CSV (o configura una automatización externa).
-
-## 3. Investigación y resolución de tres incidencias
-
-Primero examina `reports/incidencias.csv` y documenta acciones. Ejemplo:
+Ejemplos de registro de una resolución:
 
 ```powershell
-py -3 scripts/gestionar.py PAGO_DIFERENTE:PAG-0012 --responsable "Analista demo" --accion "Reconciliado con comprobante simulado; ajuste derivado a finanzas"
-py -3 scripts/gestionar.py POSIBLE_DUPLICADO:PED-0035 --responsable "Analista demo" --accion "Confirmada compra duplicada; segundo pedido bloqueado para revisión"
-py -3 scripts/gestionar.py ENVIO_ATRASADO:ENV-0020 --responsable "Analista demo" --accion "Transportista contactado; cliente informado y nueva fecha acordada"
+py -3 scripts/gestionar.py PAGO_DIFERENTE:PAG-0012 --responsable "Analista demo" --accion "Diferencia revisada con comprobante simulado; caso derivado a finanzas"
+
+py -3 scripts/gestionar.py POSIBLE_DUPLICADO:PED-0035 --responsable "Analista demo" --accion "Pedido duplicado identificado; requiere confirmación antes de procesarlo"
+
+py -3 scripts/gestionar.py ENVIO_ATRASADO:ENV-0020 --responsable "Analista demo" --accion "Se documentó contacto simulado con transportista y seguimiento al cliente"
+
 py -3 scripts/analizar.py --as-of 2026-10-21
 ```
 
-Estas acciones son **ejemplos operativos simulados**. No realizan reembolsos,
-bloqueos ni contactos reales. Las anomalías históricas siguen apareciendo como
-«detectadas», mientras su estado pasa a `RESUELTO`. Para reabrir:
+Después de ejecutar estos ejemplos, el informe mantiene los 125 hallazgos históricos, con 122 incidencias abiertas y 3 marcadas como resueltas.
+
+Para reabrir un caso:
 
 ```powershell
-py -3 scripts/gestionar.py PAGO_DIFERENTE:PAG-0012 --estado ABIERTO --responsable "Analista demo" --accion "Se requiere nueva validación"
+py -3 scripts/gestionar.py PAGO_DIFERENTE:PAG-0012 --estado ABIERTO --responsable "Analista demo" --accion "Se requiere una nueva validación"
 ```
 
-La última entrada del historial determina el estado; las anteriores permanecen
-para auditoría. Consulta `docs/casos.md` para el procedimiento y el guion del video.
+El estado vigente se obtiene de la última acción registrada. Las entradas anteriores se conservan en la bitácora. El procedimiento de investigación y el guion del video están en [docs/casos.md](docs/casos.md).
 
-## 4. Automatización diaria
+## Planilla de análisis
 
-**Windows (Programador de tareas):**
+El archivo [`panel_operaciones.xlsx`](panel_operaciones.xlsx) se puede abrir con LibreOffice Calc o importar a Google Sheets. Incluye las hojas `Panel`, `Resumen_cruzado`, `Pedidos`, `Pagos`, `Envios`, `Tickets`, `Incidencias`, `Parametros` y `Guia`.
 
-1. Abre «Programador de tareas» → «Crear tarea básica».
-2. Frecuencia: **diariamente**; selecciona la hora que quieras.
-3. Acción: «Iniciar un programa».
-4. Programa: ruta absoluta a `ejecutar_informe.bat` dentro de este proyecto.
-5. En «Iniciar en» usa la ruta de la carpeta raíz, **sin comillas**.
-6. Ejecuta la tarea manualmente y comprueba `reports/ejecuciones.log` y
-   `reports/informe_ultimo.md`.
+La hoja `Resumen_cruzado` utiliza fórmulas para agrupar pedidos por región y categoría. Es una matriz de resumen, no una tabla dinámica nativa en el archivo Excel. Una versión convertida a Google Sheets puede incorporar una tabla dinámica independiente.
 
-**Linux (cron):** sustituye `/ruta/al/proyecto` por la ruta absoluta:
+La planilla es una copia de los datos de la simulación. Ejecutar Python actualiza los archivos de `reports/`, pero no sincroniza automáticamente Google Sheets ni el archivo `.xlsx`.
+
+## Automatización diaria
+
+En Windows se incluye `ejecutar_informe.bat`, que puede programarse mediante el Programador de tareas:
+
+1. Abre el Programador de tareas y selecciona **Crear tarea básica**.
+2. Selecciona una ejecución diaria y define la hora.
+3. En **Iniciar un programa**, indica la ruta absoluta a `ejecutar_informe.bat`.
+4. Si configuras el campo **Iniciar en**, utiliza la ruta de la carpeta del proyecto, sin comillas.
+5. Ejecuta la tarea manualmente y revisa `reports/ejecuciones.log` y `reports/informe_ultimo.md`.
+
+En Linux, puedes configurar `cron` (cambia la ruta de ejemplo):
 
 ```cron
 0 9 * * * cd /ruta/al/proyecto && /usr/bin/python3 scripts/analizar.py >> reports/ejecuciones.log 2>&1
 ```
 
-Ambas opciones ejecutan el análisis sin intervención, pero no reciben pedidos
-nuevos por sí solas: es una **simulación**, no una integración con e-commerce.
+Estas tareas automatizan el análisis de los CSV existentes. No obtienen datos nuevos de una tienda real.
 
-## 5. Pruebas
+## Pruebas
+
+En Windows:
 
 ```powershell
 py -3 -m unittest discover -s tests -v
 ```
 
-Las pruebas verifican los 500 pedidos, los 4 tipos de controles, IDs únicos
-de incidencias y consistencia de indicadores.
+En Linux o macOS:
 
-## 6. Evidencia pública solicitada
+```bash
+python3 -m unittest discover -s tests -v
+```
 
-- [x] Código fuente y dataset CSV ficticio, listos para un repositorio GitHub.
-- [x] Planilla con panel y gráficos descargable.
-- [x] Vista previa en PNG para agregar al README.
-- [x] Informe diario automatizable con Python.
-- [x] Casos reproducibles y video explicativo subtitulado generado con datos sintéticos.
-- [ ] Repositorio **publicado** en la cuenta del autor.
-- [ ] Google Sheet **compartido en solo lectura** desde la cuenta del autor.
-- [ ] Captura real en Sheets/Calc y, si se desea, video de pantalla **grabado** por el autor con su explicación.
+Las pruebas comprueban la cantidad de registros, los controles de detección, la unicidad de las incidencias y la consistencia de los indicadores antes y después de documentar resoluciones.
 
-Consulta [docs/publicar.md](docs/publicar.md) para completar la publicación y la evidencia externa.
+## Estructura del proyecto
 
-## Alcances y límites
+```text
+centro-operaciones-tienda/
+├── data/                      # Pedidos, pagos, envíos, tickets y resoluciones
+├── scripts/
+│   ├── generar_datos.py       # Generación reproducible de datos
+│   ├── analizar.py            # Controles e informes
+│   └── gestionar.py           # Bitácora de resoluciones
+├── reports/                   # Incidencias, indicadores e informes generados
+├── tests/                     # Pruebas unitarias
+├── docs/                      # Diccionario de datos, casos y publicación
+├── evidencias/                # Captura del panel y video de demostración
+├── panel_operaciones.xlsx     # Panel y tablas para Sheets/Calc
+├── ejecutar_informe.bat       # Ejecución en Windows
+├── requirements.txt           # Sin dependencias externas
+├── LICENSE
+└── README.md
+```
 
-- Moneda CLP; tiempos SLA en horas corridas (no horario hábil).
-- Los duplicados son **indicios**, no evidencia concluyente de doble cobro.
-- Un pago `PENDIENTE` o `RECHAZADO` no se clasifica como diferencia contable.
-- Un incumplimiento SLA puede ser histórico aunque el ticket ya haya recibido respuesta.
-- Las incidencias se detectan por reglas; la investigación es humana y se audita.
-- CSV es la fuente de verdad de la demo. No hay base de datos, API ni conexiones reales.
+## Limitaciones
 
-**Licencia:** MIT.
+- Los datos son sintéticos y se almacenan en CSV; no hay base de datos, API ni integración con una plataforma de comercio electrónico.
+- Los duplicados son coincidencias sospechosas que requieren revisión, no pruebas de doble cobro.
+- Los pagos pendientes o rechazados se contabilizan por separado de las diferencias de monto.
+- Los plazos SLA se expresan en horas corridas, no en horario laboral.
+- Un incumplimiento SLA puede seguir figurando en el histórico aunque ya se haya respondido el ticket.
+- Marcar una incidencia como resuelta documenta una acción operativa; no implica una modificación real del pedido, pago o envío.
+- El panel no se actualiza automáticamente al ejecutar los scripts.
+
+## Licencia
+
+Distribuido bajo la [licencia MIT](LICENSE).
